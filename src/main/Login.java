@@ -1,13 +1,14 @@
-
 package main;
 
 import config.config;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.HashMap; // Added import for Map/HashMap
 
 public class Login {
-    public static boolean login(){
+    // MODIFIED: Method now returns Map of user data or null
+    public static Map<String, Object> login(){
         config conf = new config();
         Scanner sc = new Scanner(System.in);
         
@@ -23,20 +24,25 @@ public class Login {
         
         if (!result.isEmpty()){
             
-            String name = result.get(0).get("name").toString();
-            String type = result.get(0).get("type").toString();
-            String status = result.get(0).get("status").toString();
+            Map<String, Object> userData = result.get(0);
+            String name = userData.get("name").toString();
+            String type = userData.get("type").toString();
+            String status = userData.get("status").toString();
             
             if ("Approved".equals(status)) {
-            System.out.println("\n\nWelcome " + name + " [" + type + "]\n\n");
-            return true; // Login successful and approved
+                // Ensure the Map contains u_id and type for main
+                userData.put("id", (int)userData.get("id")); // Assuming u_id is an integer
+                userData.put("type", type);
+                
+                System.out.println("\n\nWelcome " + name + " [" + type + "]\n\n");
+                return userData; // Login successful and approved, return data
             } else {
-                System.out.println("Your account is not approved.");
-                return false; // Login successful but status is Pending
+                System.out.println("Your account is not approved. Status: " + status);
+                return null; // Login successful but status is Pending
             }
         } else {
             System.out.println("INVALID INPUT.");
-            return false; // Login failed (bad email/password)
-    }     
+            return null; // Login failed (bad email/password)
+        }       
     }
 }
